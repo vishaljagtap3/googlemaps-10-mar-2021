@@ -7,6 +7,7 @@ import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,13 +17,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -68,6 +72,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        /*Projection projection = mMap.getProjection();
+        LatLng latLng = projection.fromScreenLocation(new Point(200, 300));
+        mt("latlng: " + latLng.latitude + "," + latLng.longitude);
+
+        Point p = projection.toScreenLocation(mumbai.getPosition());
+        mt("Point: " + p.x + " " + p.y);*/
+
+
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
@@ -87,7 +99,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     void drawShapes() {
 
         circle = mMap.addCircle(
-                    new CircleOptions()
+                new CircleOptions()
                         .center(pune.getPosition())
                         .radius(5000)
                         .fillColor(Color.argb(90, 255, 0, 0))
@@ -98,10 +110,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         Polygon polygon = mMap.addPolygon(
                 new PolygonOptions()
-                .add( new LatLng(28.7041, 77.1025))
-                        .add( new LatLng(26.9124, 75.7873))
-                        .add( new LatLng(22.7196, 75.8577))
-                        .add( new LatLng(28.6856, 79.3452))
+                        .add(new LatLng(28.7041, 77.1025))
+                        .add(new LatLng(26.9124, 75.7873))
+                        .add(new LatLng(22.7196, 75.8577))
+                        .add(new LatLng(28.6856, 79.3452))
                         .add(new LatLng(22.5726, 88.3639))
         );
 
@@ -142,6 +154,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         });
+
+
     }
 
     class MyMarkerDragListener implements GoogleMap.OnMarkerDragListener {
@@ -173,6 +187,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         public boolean onMarkerClick(Marker marker) {
             mt("Marker Click: " + marker.getTitle());
+
+            Projection projection = mMap.getProjection();
+            LatLng latLng = projection.fromScreenLocation(new Point(200, 300));
+            mt("latlng: " + latLng.latitude + "," + latLng.longitude);
+
+            Point p = projection.toScreenLocation(mumbai.getPosition());
+            mt("Point: " + p.x + " " + p.y);
+
+
             return false;
         }
     }
@@ -193,6 +216,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     )
             );
 
+            //mMap.moveCamera();
+
+            CameraPosition.Builder builder = new CameraPosition.Builder();
+            CameraPosition cameraPosition =
+                    builder.target(pune.getPosition())
+                            .zoom(19)
+                            .tilt(90)
+                            .bearing(60)
+                            .build();
+
+
+            mMap.animateCamera(
+                    CameraUpdateFactory.newCameraPosition(cameraPosition),
+                    5000,
+                    null
+            );
+
+            /*CameraUpdate cameraUpdate =
+                    CameraUpdateFactory.newLatLngZoom(
+                            pune.getPosition(), 18
+                    );
+            mMap.animateCamera(
+                    cameraUpdate,
+                    5000,
+                    new GoogleMap.CancelableCallback() {
+                        @Override
+                        public void onFinish() {
+
+                        }
+
+                        @Override
+                        public void onCancel() {
+
+                        }
+                    }
+            );*/
 
         }
     }
